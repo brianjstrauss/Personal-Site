@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Single Page Application</title>
+<style>
+    /* Style for the content div */
+    #content {
+        padding: 20px;
+        border: 1px solid #ccc;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+
+<nav>
+    <ul>
+        <li><a href="#/home">Home</a></li>
+        <li><a href="#/contact">Contact</a></li>
+        <li><a href="#/email">Email</a></li>
+        <li><a href="#/schedule-a-call">Schedule a Call</a></li>
+        <li><a href="#/resume">Resume</a></li>
+        <li><a href="#/certificates">Certificates</a></li>
+        <li><a href="#/portfolio">Portfolio</a></li>
+    </ul>
+</nav>
+
+<div id="content">
+    <!-- Content will be dynamically added here -->
+</div>
+
+<script>
+    // Function to update content based on the URL hash
+    function updateContent() {
+        var urlHash = window.location.hash;
+        var pageName = "home"; // Default page name
+        var hashRemainder = "";
+
+        // Extract the page name and hash remainder from the URL hash
+        if (urlHash !== "") {
+            var hashParts = urlHash.split("/");
+            pageName = hashParts[1];
+            hashRemainder = hashParts.slice(2).join("/");
+        }
+
+        // Fetch the content of the page
+        fetch("./pages/" + pageName + ".html")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                // Load content into the content div
+                document.getElementById("content").innerHTML = data;
+
+                // Update the hash remainder variable
+                window.hashRemainder = hashRemainder;
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                // If there is an error, load the 404.html content
+                fetch("./pages/404.html")
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        // Load 404 content into the content div
+                        document.getElementById("content").innerHTML = data;
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            });
+    }
+
+    // Call the updateContent function when the page loads and when the hash changes
+    window.onload = updateContent;
+    window.onhashchange = updateContent;
+</script>
+
+</body>
+</html>
